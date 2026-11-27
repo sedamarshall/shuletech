@@ -1,0 +1,26 @@
+# Secrets: copy the .example file next to each and fill in real values
+/application/config/database.php
+/application/config/shuletech_security.php
+/application/config/api_keys.php
+.env
+.claude/settings.local.json
+
+# Backups, dumps and test credentials
+/backup/
+*.sql
+
+# Runtime files
+/temp/*
+/application/tmp/
+/application/logs/*
+!/application/logs/index.html
+/application/cache/*
+!/application/cache/index.html
+
+# User uploads (student photos, documents): keep folder structure only
+/uploads/*/**
+!/uploads/*/**/
+!/uploads/*/**/index.html
+
+# Firebase / Google service-account key (push notifications)
+/application/third_party/firebase_notification_key.json

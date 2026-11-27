@@ -1,0 +1,19 @@
+# SHULETECH SECURITY PATCH (2026-11-18): uploaded files are data, never code.
+# Block anything that could be executed or used to reconfigure the server.
+<FilesMatch "(?i)\.(php[0-9]?|phtml|pht|phar|phps|pgif|shtml?|cgi|pl|py|rb|sh|asp|aspx|ashx|asmx|jsp|jspx|htaccess|htpasswd|ini)$">
+	<IfModule authz_core_module>
+		Require all denied
+	</IfModule>
+	<IfModule !authz_core_module>
+		Deny from all
+	</IfModule>
+</FilesMatch>
+# Belt and braces: turn the PHP engine off in this tree where mod_php is used.
+<IfModule mod_php.c>
+	php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+	php_flag engine off
+</IfModule>
+# No directory listings of student/staff documents.
+Options -Indexes

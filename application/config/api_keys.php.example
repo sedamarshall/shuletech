@@ -1,0 +1,9 @@
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+/*
+ | Third-party API keys. This file is NOT in git (see .gitignore).
+ | Copy api_keys.php.example to api_keys.php on each server and fill it in.
+ */
+$config['paymongo_public_key']   = '';
+$config['paymongo_secret_key']   = '';
+$config['yandex_translate_key']  = '';

@@ -1,0 +1,7 @@
+# SHULETECH SECURITY PATCH (2026-11-18): this folder must never be served over the web.
+<IfModule authz_core_module>
+	Require all denied
+</IfModule>
+<IfModule !authz_core_module>
+	Deny from all
+</IfModule>
