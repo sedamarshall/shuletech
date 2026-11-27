@@ -1,0 +1,546 @@
+/*
+ * SHULETECH UI - shadcn/ui-style theme for the Smart School admin & portal.
+ * Loaded after every other stylesheet. Colours come from the tokens below;
+ * dark mode = <html class="st-dark"> (toggled from the header, remembered per browser).
+ */
+:root {
+  --radius: 10px;
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --primary: #171717;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #171717;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --accent: #f4f4f5;
+  --accent-foreground: #171717;
+  --destructive: #e7000b;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #a1a1a1;
+  --sidebar: #fafafa;
+  --sidebar-foreground: #0a0a0a;
+  --sidebar-accent: #f0f0f1;
+  --sidebar-border: #e5e5e5;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+  /* soft icon-chip tints (like the reference dashboard) */
+  --tint-rose: #fdf2f8;  --tint-rose-fg: #db2777;
+  --tint-blue: #eff6ff;  --tint-blue-fg: #2563eb;
+  --tint-green: #f0fdf4; --tint-green-fg: #16a34a;
+  --tint-amber: #fffbeb; --tint-amber-fg: #d97706;
+  --tint-violet: #f5f3ff;--tint-violet-fg: #7c3aed;
+  --success: #16a34a;
+  --header-h: 56px;
+  color-scheme: light;
+}
+html.st-dark {
+  --background: #0f0f10;
+  --foreground: #fafafa;
+  --card: #18181a;
+  --card-foreground: #fafafa;
+  --popover: #1c1c1f;
+  --primary: #e5e5e5;
+  --primary-foreground: #171717;
+  --secondary: #262626;
+  --secondary-foreground: #fafafa;
+  --muted: #232325;
+  --muted-foreground: #a1a1a1;
+  --accent: #262628;
+  --accent-foreground: #fafafa;
+  --destructive: #ff6467;
+  --border: rgba(255,255,255,.09);
+  --input: rgba(255,255,255,.13);
+  --ring: #737373;
+  --sidebar: #141415;
+  --sidebar-foreground: #fafafa;
+  --sidebar-accent: #222224;
+  --sidebar-border: rgba(255,255,255,.08);
+  --shadow-sm: none;
+  --tint-rose: rgba(236,72,153,.14);  --tint-rose-fg: #f472b6;
+  --tint-blue: rgba(59,130,246,.15);  --tint-blue-fg: #60a5fa;
+  --tint-green: rgba(34,197,94,.14);  --tint-green-fg: #4ade80;
+  --tint-amber: rgba(245,158,11,.15); --tint-amber-fg: #fbbf24;
+  --tint-violet: rgba(139,92,246,.16);--tint-violet-fg: #a78bfa;
+  --success: #4ade80;
+  color-scheme: dark;
+}
+
+/* ---------- base ---------- */
+html body, html body .wrapper, html body .content-wrapper, html body .right-side {
+  background: var(--background) !important;
+  color: var(--foreground);
+}
+html body { font-size: 14px; -webkit-font-smoothing: antialiased; }
+html body h1, html body h2, html body h3, html body h4, html body h5, html body h6,
+html body .box-title, html body label, html body .control-label, html body p,
+html body .content-wrapper td, html body .content-wrapper th, html body dt, html body dd,
+html body .modal-title, html body legend { color: var(--foreground); }
+html body a { color: var(--foreground); }
+html body .content-wrapper a:not(.btn):not(.label):not(.badge):hover { color: var(--foreground); opacity: .8; }
+html body .text-muted, html body small, html body .help-block { color: var(--muted-foreground) !important; }
+html body hr { border-color: var(--border); }
+html body ::selection { background: rgba(120,120,120,.25); }
+html body ::-webkit-scrollbar { width: 10px; height: 10px; }
+html body ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
+html body ::-webkit-scrollbar-track { background: transparent; }
+
+/* unregistered-licence strip */
+html body .topaleart, html body .topaleart .slidealert, html body .topaleart-inside {
+  background: var(--muted) !important; color: var(--muted-foreground) !important; border: 0 !important;
+}
+html body .topaleart-inside p, html body .topaleart-inside strong { color: var(--muted-foreground) !important; }
+
+/* ---------- header ---------- */
+html body .main-header { box-shadow: none !important; background: transparent !important; }
+html body .main-header .logo {
+  height: var(--header-h) !important; line-height: var(--header-h) !important;
+  background: var(--sidebar) !important; border-right: 1px solid var(--sidebar-border) !important;
+  border-bottom: 1px solid var(--sidebar-border) !important;
+}
+html body .main-header .logo img { max-height: 34px; }
+html body .main-header .navbar {
+  min-height: var(--header-h) !important; height: var(--header-h) !important;
+  background: color-mix(in srgb, var(--background) 88%, transparent) !important;
+  -webkit-backdrop-filter: saturate(150%) blur(10px); backdrop-filter: saturate(150%) blur(10px);
+  border-bottom: 1px solid var(--border) !important; box-shadow: none !important;
+}
+html body .main-header .navbar > div, html body .main-header .navbar .pull-right { height: var(--header-h); display: flex; align-items: center; }
+html body .main-header .navbar .pull-right { justify-content: flex-end; width: 100%; gap: 6px; }
+html body .main-header .sidebar-toggle {
+  color: var(--muted-foreground) !important; background: transparent !important;
+  height: 34px; width: 34px; padding: 0 !important; margin: 11px 0 0 12px; border-radius: 8px;
+  display: inline-flex !important; align-items: center; justify-content: center;
+}
+html body .main-header .sidebar-toggle:before { font-family: 'lucide' !important; content: "\e12a" !important; font-size: 18px; }
+html body .main-header .sidebar-toggle:hover { background: var(--accent) !important; color: var(--foreground) !important; }
+html body .main-header .sidebar-session { color: var(--foreground) !important; font-weight: 600 !important; font-size: 15px; }
+html body .main-header .navbar-nav > li > a,
+html body .main-header .headertopmenu > li > a {
+  color: var(--muted-foreground) !important; background: transparent !important;
+  border-radius: 8px; padding: 8px 10px !important; margin: 0 1px; line-height: 20px;
+}
+html body .main-header .headertopmenu > li > a:hover { background: var(--accent) !important; color: var(--foreground) !important; }
+html body .main-header .headertopmenu > li > a i { font-size: 17px; color: inherit !important; }
+html body .main-header .headertopmenu { display: flex; align-items: center; }
+html body .main-header .topuser-image { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border); }
+html body .main-header .user-menu > a { padding: 6px !important; }
+
+/* header search: shadcn command-style pill */
+html body .main-header .search-form { margin: 0 8px 0 0 !important; padding: 0 !important; border: 0 !important; box-shadow: none !important; }
+html body .main-header .search-form .input-group { position: relative; width: 300px; display: flex; }
+html body .main-header #search_text1 {
+  height: 36px !important; border-radius: 9px !important; width: 100% !important;
+  background: var(--muted) !important; border: 1px solid var(--border) !important;
+  color: var(--foreground) !important; padding-left: 34px !important; box-shadow: none !important;
+}
+html body .main-header .topsidesearchbtn {
+  position: absolute !important; left: 4px; top: 3px; z-index: 3; height: 30px; width: 30px;
+  background: transparent !important; border: 0 !important; color: var(--muted-foreground) !important; padding: 0 !important;
+}
+html body .main-header .input-group-btn { position: static; width: 0; }
+html body .langdiv, html body .currency-icon-list { margin: 0 4px; }
+html body .st-theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px;
+  border-radius: 8px; color: var(--muted-foreground); cursor: pointer; border: 0; background: transparent; font-size: 17px;
+}
+html body .st-theme-toggle:hover { background: var(--accent); color: var(--foreground); }
+html body .st-theme-toggle .st-sun { display: none; }
+html.st-dark body .st-theme-toggle .st-sun { display: inline; }
+html.st-dark body .st-theme-toggle .st-moon { display: none; }
+
+/* ---------- sidebar ---------- */
+html body .main-sidebar, html body .left-side {
+  background: var(--sidebar) !important; border-right: 1px solid var(--sidebar-border) !important;
+  box-shadow: none !important; top: var(--header-h) !important; padding-top: 0 !important;
+}
+html body .sidebar { padding: 8px 0 24px; }
+html body .sidebar-menu { padding: 0 8px !important; }
+html body .sidebar-menu > li { margin: 0 !important; }
+html body .sidebar-menu > li > a {
+  display: flex !important; align-items: center; gap: 10px;
+  color: var(--sidebar-foreground) !important; background: transparent !important;
+  padding: 8px 10px !important; margin: 1px 0 !important; border-radius: 8px !important;
+  font-size: 14px !important; font-weight: 500 !important; border: 0 !important; line-height: 20px;
+}
+html body .sidebar-menu > li > a > span { flex: 1; }
+html body .sidebar-menu > li > a > i:first-child, html body .sidebar-menu > li > a > .fa:first-child {
+  width: 18px !important; font-size: 16px !important; text-align: center; color: var(--muted-foreground) !important;
+  margin: 0 !important; padding: 0 !important; background: transparent !important;
+}
+html body .sidebar-menu > li > a > .pull-right { color: var(--muted-foreground) !important; font-size: 14px; margin: 0 !important; transition: transform .15s; }
+html body .sidebar-menu > li.menu-open > a > .pull-right, html body .sidebar-menu > li.active > a > .pull-right { transform: rotate(-90deg); }
+html body .sidebar-menu > li:hover > a, html body .sidebar-menu > li > a:hover { background: var(--sidebar-accent) !important; color: var(--sidebar-foreground) !important; }
+html body .sidebar-menu > li.active > a { background: var(--sidebar-accent) !important; color: var(--sidebar-foreground) !important; font-weight: 600 !important; }
+html body .sidebar-menu > li.active > a > i:first-child { color: var(--sidebar-foreground) !important; }
+html body .sidebar-menu .treeview-menu {
+  background: transparent !important; margin: 2px 0 6px 18px !important; padding: 0 0 0 10px !important;
+  border-left: 1px solid var(--sidebar-border) !important;
+}
+html body .sidebar-menu .treeview-menu > li > a {
+  color: var(--muted-foreground) !important; padding: 6px 10px !important; font-size: 13.5px !important;
+  border-radius: 7px; display: block; font-weight: 450; background: transparent !important; margin: 1px 0;
+}
+html body .sidebar-menu .treeview-menu > li > a > i { display: none !important; }
+html body .sidebar-menu .treeview-menu > li > a:hover { color: var(--sidebar-foreground) !important; background: var(--sidebar-accent) !important; }
+html body .sidebar-menu .treeview-menu > li.active > a { color: var(--sidebar-foreground) !important; background: var(--sidebar-accent) !important; font-weight: 600; }
+
+/* session + quick links block at top of sidebar */
+html body .sessionul { background: transparent !important; padding: 0 8px 6px !important; margin: 0 0 6px !important; border-bottom: 1px solid var(--sidebar-border); }
+html body .sessionul > li > a {
+  color: var(--muted-foreground) !important; background: transparent !important; border-radius: 8px;
+  padding: 7px 10px !important; font-size: 12.5px !important; font-weight: 500 !important; display: flex !important; align-items: center;
+}
+html body .sessionul > li > a > span { flex: 1; }
+html body .sessionul > li > a:hover { background: var(--sidebar-accent) !important; color: var(--sidebar-foreground) !important; }
+html body .search-form2 .form-control { background: var(--muted) !important; border-color: var(--border) !important; color: var(--foreground) !important; }
+
+/* collapsed sidebar (mini) */
+html body.sidebar-collapse .sidebar-menu > li > a { justify-content: center; }
+
+/* ---------- content layout ---------- */
+html body .content-wrapper { padding-top: var(--header-h) !important; }
+html body .content { padding: 20px 24px !important; }
+html body .content-header { padding: 20px 24px 0 !important; }
+html body .content-header > h1 { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+html body .main-footer { background: var(--background) !important; border-top: 1px solid var(--border) !important; color: var(--muted-foreground) !important; }
+
+/* ---------- cards ---------- */
+html body .box, html body .info-box, html body .topprograssstart, html body .panel, html body .nav-tabs-custom,
+html body .small-box, html body .card, html body .well, html body .staffprofile, html body .box-widget {
+  background: var(--card) !important; color: var(--card-foreground);
+  border: 1px solid var(--border) !important; border-radius: calc(var(--radius) + 2px) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+html body .box { border-top: 1px solid var(--border) !important; margin-bottom: 20px; }
+html body .box-header { padding: 16px 20px !important; background: transparent !important; color: var(--card-foreground) !important; }
+html body .box-header.with-border { border-bottom: 1px solid var(--border) !important; }
+html body .box-header .box-title, html body .box-title { font-size: 15.5px !important; font-weight: 600 !important; letter-spacing: -.005em; color: var(--card-foreground) !important; }
+html body .box-body { padding: 16px 20px !important; }
+html body .box-footer { background: transparent !important; border-top: 1px solid var(--border) !important; padding: 12px 20px !important; }
+html body .box .box-tools .btn-box-tool { color: var(--muted-foreground) !important; }
+html body .panel-heading, html body .panel-footer { background: transparent !important; border-color: var(--border) !important; color: var(--card-foreground) !important; }
+html body .panel-body { background: transparent !important; }
+
+/* dashboard progress widgets */
+html body .topprograssstart { padding: 16px 18px !important; margin-bottom: 18px; }
+html body .topprograssstart p { color: var(--card-foreground) !important; font-size: 13px !important; font-weight: 500; display: flex; align-items: center; gap: 10px; margin: 0 0 12px !important; }
+html body .topprograssstart p .pull-right { margin-left: auto; font-weight: 700; font-size: 15px; }
+html body .topprograssstart p > i.ftlayer, html body .topprograssstart p > i:first-child {
+  width: 34px; height: 34px; border-radius: 9px; display: inline-flex !important; align-items: center; justify-content: center;
+  font-size: 16px !important; margin: 0 !important; background: var(--tint-blue) !important; color: var(--tint-blue-fg) !important;
+}
+html body .col-md-3:nth-child(4n+2) .topprograssstart p > i:first-child { background: var(--tint-green) !important; color: var(--tint-green-fg) !important; }
+html body .col-md-3:nth-child(4n+3) .topprograssstart p > i:first-child { background: var(--tint-rose) !important; color: var(--tint-rose-fg) !important; }
+html body .col-md-3:nth-child(4n+4) .topprograssstart p > i:first-child { background: var(--tint-amber) !important; color: var(--tint-amber-fg) !important; }
+html body .progress, html body .progress-minibar { background: var(--muted) !important; border-radius: 99px !important; height: 6px !important; box-shadow: none !important; overflow: hidden; }
+html body .progress-bar { background: var(--primary) !important; border-radius: 99px; box-shadow: none !important; }
+
+/* info boxes (stat cards) */
+html body .info-box { min-height: 96px; padding: 18px !important; display: flex; align-items: center; gap: 14px; }
+html body .info-box-icon {
+  width: 44px !important; height: 44px !important; line-height: 44px !important; border-radius: 10px !important; font-size: 20px !important;
+  background: var(--tint-violet) !important; color: var(--tint-violet-fg) !important; float: none !important; flex: none; display: inline-flex !important; align-items: center; justify-content: center;
+}
+html body .info-box-icon i { color: inherit !important; }
+html body .info-box-content { margin: 0 !important; padding: 0 !important; }
+html body .info-box-text { color: var(--muted-foreground) !important; font-size: 12px !important; text-transform: uppercase; letter-spacing: .04em; font-weight: 500 !important; }
+html body .info-box-number { color: var(--card-foreground) !important; font-size: 24px !important; font-weight: 700 !important; letter-spacing: -.02em; }
+html body .info-box a { display: contents; }
+
+/* ---------- buttons ---------- */
+html body .btn {
+  border-radius: 8px !important; font-size: 13.5px !important; font-weight: 500 !important; box-shadow: none !important;
+  padding: 7px 14px; line-height: 20px; transition: background .15s, opacity .15s, border-color .15s; text-shadow: none !important;
+}
+html body .btn-xs { padding: 3px 8px !important; font-size: 12px !important; border-radius: 6px !important; }
+html body .btn-sm { padding: 5px 11px !important; font-size: 12.5px !important; }
+html body .btn:focus-visible { outline: 0; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 45%, transparent) !important; }
+html body .btn-primary, html body .btn-primary:focus, html body .btn-primary:active {
+  background: var(--primary) !important; color: var(--primary-foreground) !important; border: 1px solid var(--primary) !important;
+}
+html body .btn-primary:hover { opacity: .9; }
+html body .btn-primary i { color: inherit !important; }
+html body .btn-default, html body .btn-default:focus {
+  background: var(--background) !important; color: var(--foreground) !important; border: 1px solid var(--input) !important;
+}
+html body .btn-default:hover { background: var(--accent) !important; }
+html body .btn-info, html body .btn-success, html body .btn-warning {
+  background: var(--secondary) !important; color: var(--secondary-foreground) !important; border: 1px solid var(--border) !important;
+}
+html body .btn-info:hover, html body .btn-success:hover, html body .btn-warning:hover { background: var(--accent) !important; }
+html body .btn-danger { background: var(--destructive) !important; color: #fff !important; border: 1px solid var(--destructive) !important; }
+html body .btn-danger:hover { opacity: .9; }
+html body .btn-link { color: var(--foreground) !important; }
+html body .btn i, html body .btn .fa { color: inherit; }
+
+/* ---------- forms ---------- */
+html body .form-control, html body select.form-control, html body .input-group-addon,
+html body .select2-container--default .select2-selection--single, html body .select2-container--default .select2-selection--multiple,
+html body .bootstrap-select > .dropdown-toggle {
+  background: transparent !important; color: var(--foreground) !important;
+  border: 1px solid var(--input) !important; border-radius: 8px !important; box-shadow: var(--shadow-sm) !important;
+  min-height: 36px; font-size: 14px;
+}
+html.st-dark body .form-control, html.st-dark body .input-group-addon { background: rgba(255,255,255,.035) !important; }
+html body select.form-control option { background: var(--popover); color: var(--foreground); }
+html body .form-control:focus, html body .bootstrap-select > .dropdown-toggle:focus {
+  border-color: var(--ring) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 35%, transparent) !important; outline: 0 !important;
+}
+html body .form-control::placeholder { color: var(--muted-foreground) !important; opacity: 1; }
+html body .form-control[disabled], html body .form-control[readonly] { background: var(--muted) !important; opacity: .8; }
+html body .input-group .form-control:first-child:not(:last-child) { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+html body .input-group .form-control:last-child:not(:first-child) { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+html body .input-group-addon { color: var(--muted-foreground) !important; }
+html body label { font-weight: 500 !important; font-size: 13.5px; }
+html body .req, html body .text-danger { color: var(--destructive) !important; }
+html body .checkbox label, html body .radio label { font-weight: 400 !important; }
+html body input[type=checkbox], html body input[type=radio] { accent-color: var(--primary); }
+
+/* ---------- tables ---------- */
+html body .table, html body table.dataTable { background: transparent !important; color: var(--card-foreground); border-collapse: collapse !important; }
+html body .table > thead > tr > th, html body table.dataTable thead th {
+  color: var(--muted-foreground) !important; font-weight: 500 !important; font-size: 12.5px !important;
+  background: transparent !important; border-bottom: 1px solid var(--border) !important; border-top: 0 !important; padding: 10px 12px !important; white-space: nowrap;
+}
+html body .table > tbody > tr > td, html body .table > tbody > tr > th, html body .table > tfoot > tr > td {
+  border-top: 1px solid var(--border) !important; padding: 10px 12px !important; vertical-align: middle !important;
+  background: transparent !important; color: var(--card-foreground);
+}
+html body .table-striped > tbody > tr:nth-of-type(odd), html body .table > tbody > tr { background: transparent !important; }
+html body .table-hover > tbody > tr:hover, html body table.dataTable tbody tr:hover { background: color-mix(in srgb, var(--muted) 70%, transparent) !important; }
+html body .table-bordered, html body .table-bordered > thead > tr > th, html body .table-bordered > tbody > tr > td { border-color: var(--border) !important; }
+html body .dataTables_wrapper .dataTables_filter input, html body .dataTables_wrapper .dataTables_length select {
+  background: transparent !important; color: var(--foreground) !important; border: 1px solid var(--input) !important; border-radius: 8px !important; height: 34px; padding: 4px 10px;
+}
+html body .dataTables_wrapper .dataTables_info, html body .dataTables_wrapper label { color: var(--muted-foreground) !important; }
+html body .dt-buttons .btn, html body .dt-buttons .dt-button {
+  background: var(--background) !important; color: var(--muted-foreground) !important; border: 1px solid var(--input) !important; border-radius: 7px !important; margin-right: 4px;
+}
+html body .dt-buttons .btn:hover { color: var(--foreground) !important; background: var(--accent) !important; }
+
+/* pagination */
+html body .pagination > li > a, html body .pagination > li > span,
+html body .dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: transparent !important; color: var(--foreground) !important; border: 1px solid transparent !important; border-radius: 8px !important; margin: 0 2px;
+}
+html body .pagination > li > a:hover, html body .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background: var(--accent) !important; }
+html body .pagination > .active > a, html body .pagination > .active > span,
+html body .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: var(--background) !important; border-color: var(--input) !important; color: var(--foreground) !important; font-weight: 600;
+}
+
+/* ---------- labels / badges / alerts ---------- */
+html body .label, html body .badge {
+  border-radius: 6px !important; font-weight: 500 !important; font-size: 11.5px !important; padding: 3px 8px !important;
+}
+html body .label-default, html body .badge { background: var(--secondary) !important; color: var(--secondary-foreground) !important; }
+html body .label-success, html body .bg-green { background: var(--tint-green) !important; color: var(--tint-green-fg) !important; }
+html body .label-danger, html body .bg-red { background: color-mix(in srgb, var(--destructive) 16%, transparent) !important; color: var(--destructive) !important; }
+html body .label-warning, html body .bg-yellow { background: var(--tint-amber) !important; color: var(--tint-amber-fg) !important; }
+html body .label-info, html body .label-primary, html body .bg-aqua, html body .bg-blue { background: var(--tint-blue) !important; color: var(--tint-blue-fg) !important; }
+html body .alert { border-radius: var(--radius) !important; border: 1px solid var(--border) !important; background: var(--card) !important; color: var(--card-foreground) !important; }
+html body .alert-danger { color: var(--destructive) !important; }
+html body .alert-success { color: var(--success) !important; }
+
+/* ---------- tabs ---------- */
+html body .nav-tabs, html body .nav-tabs-custom > .nav-tabs { border-bottom: 1px solid var(--border) !important; background: transparent !important; }
+html body .nav-tabs > li > a, html body .nav-tabs-custom > .nav-tabs > li > a {
+  color: var(--muted-foreground) !important; border: 0 !important; border-bottom: 2px solid transparent !important; background: transparent !important; border-radius: 0 !important; font-weight: 500;
+}
+html body .nav-tabs-custom > .nav-tabs > li { border-top: 0 !important; margin-bottom: -1px; }
+html body .nav-tabs > li.active > a, html body .nav-tabs-custom > .nav-tabs > li.active > a {
+  color: var(--foreground) !important; border-bottom-color: var(--foreground) !important; background: transparent !important;
+}
+html body .nav-tabs-custom > .tab-content { background: transparent !important; }
+html body .nav-pills > li > a { border-radius: 8px !important; color: var(--muted-foreground) !important; }
+html body .nav-pills > li.active > a { background: var(--accent) !important; color: var(--foreground) !important; }
+
+/* ---------- dropdowns / modals / popovers ---------- */
+html body .dropdown-menu {
+  background: var(--popover) !important; border: 1px solid var(--border) !important; border-radius: var(--radius) !important;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,.25) !important; padding: 4px !important;
+}
+html body .dropdown-menu > li > a { color: var(--foreground) !important; border-radius: 6px; padding: 7px 10px !important; }
+html body .dropdown-menu > li > a:hover, html body .dropdown-menu > .active > a { background: var(--accent) !important; color: var(--foreground) !important; }
+html body .dropdown-menu .divider { background: var(--border) !important; }
+html body .modal-content { background: var(--popover) !important; border: 1px solid var(--border) !important; border-radius: calc(var(--radius) + 4px) !important; box-shadow: 0 20px 50px -12px rgba(0,0,0,.4) !important; }
+html body .modal-header { border-bottom: 1px solid var(--border) !important; background: transparent !important; padding: 16px 20px !important; }
+html body .modal-header .close { color: var(--muted-foreground) !important; opacity: 1; text-shadow: none; }
+html body .modal-footer { border-top: 1px solid var(--border) !important; }
+html body .modal-backdrop.in { opacity: .6; background: #000; }
+html body .popover, html body .tooltip-inner { border-radius: 8px !important; }
+html body .tooltip-inner { background: var(--primary) !important; color: var(--primary-foreground) !important; font-size: 12px; padding: 5px 9px; }
+html body .tooltip.bottom .tooltip-arrow { border-bottom-color: var(--primary) !important; }
+html body .tooltip.top .tooltip-arrow { border-top-color: var(--primary) !important; }
+
+/* user dropdown */
+html body .sstopuser, html body .sstopuser * { background: transparent !important; }
+html body .sstopuser h4 a, html body .sstopuser h5 { color: var(--foreground) !important; }
+html body .sstopuser a { color: var(--muted-foreground) !important; }
+html body .sstopuser .divider { border-color: var(--border) !important; }
+
+/* misc legacy surfaces that hard-code white */
+html body .bg-white, html body .white-bg, html body .borderwhite, html body .mailbox-controls,
+html body .fc-view-container, html body .fc-toolbar, html body .ss-topbar, html body .studentsidebar,
+html body .box-profile, html body .list-group-item {
+  background-color: var(--card) !important; border-color: var(--border) !important; color: var(--card-foreground);
+}
+html body .list-group-item { color: var(--card-foreground) !important; }
+html body .fc-unthemed th, html body .fc-unthemed td, html body .fc-unthemed .fc-content { border-color: var(--border) !important; }
+html body .datepicker, html body .daterangepicker, html body .bootstrap-datetimepicker-widget { background: var(--popover) !important; color: var(--foreground) !important; border-color: var(--border) !important; }
+html body .datepicker table tr td.active, html body .datepicker table tr td.active:hover { background: var(--primary) !important; color: var(--primary-foreground) !important; }
+
+/* sidebar (mobile) search + todo dropdown */
+html body .search-form2 { border: 0 !important; box-shadow: none !important; background: transparent !important; }
+html body .search-form2 .btn, html body .search-btn-sm {
+  background: transparent !important; color: var(--muted-foreground) !important; border: 1px solid var(--input) !important; border-left: 0 !important;
+  border-radius: 0 8px 8px 0 !important; height: 36px;
+}
+html body .search-form2 .form-control { border-radius: 8px 0 0 8px !important; }
+html body .todoview, html body .ssnoti, html body .todolist, html body .todolist li { background: transparent !important; color: var(--foreground) !important; border-color: var(--border) !important; }
+
+/* leftovers found by the per-module scan */
+html body .card-columns-sidebar, html body .card-columns-sidebar a, html body .card-columns-sidebar h4 { color: var(--foreground) !important; }
+html body .card-columns-sidebar a { color: var(--muted-foreground) !important; }
+html body .card-columns-sidebar a:hover { color: var(--foreground) !important; }
+html body .side-navbar-vertical, html body .verticalmenu { background: var(--popover) !important; border: 1px solid var(--border) !important; }
+html body .pagetitleh2, html body .addmoredetail-title, html body .pagetitleh, html body .pagetitleh-whitebg {
+  background: transparent !important; color: var(--foreground) !important; border-bottom: 1px solid var(--border) !important;
+  font-size: 15px !important; font-weight: 600 !important; padding: 12px 0 10px !important; margin-bottom: 14px !important;
+}
+html body .dropify-wrapper { background: transparent !important; border: 1px dashed var(--input) !important; border-radius: var(--radius) !important; color: var(--muted-foreground) !important; }
+html body .dropify-wrapper:hover { background: var(--muted) !important; }
+html body .dropify-wrapper .dropify-message p, html body .dropify-wrapper .dropify-message span { color: var(--muted-foreground) !important; }
+html body .dt-input, html body .dt-search input, html body .dt-length select {
+  background: transparent !important; color: var(--foreground) !important; border: 1px solid var(--input) !important; border-radius: 8px !important; height: 34px; padding: 4px 10px !important;
+}
+html body .dt-info, html body .dt-length label, html body .dt-search label { color: var(--muted-foreground) !important; }
+html body .dt-paging .dt-paging-button { background: transparent !important; color: var(--foreground) !important; border: 1px solid transparent !important; border-radius: 8px !important; }
+html body .dt-paging .dt-paging-button.current { border-color: var(--input) !important; font-weight: 600; }
+html body .dt-paging .dt-paging-button.disabled { color: var(--muted-foreground) !important; opacity: .5; }
+html body .fc-widget-header, html body .fc-head-container, html body .fc-day-header, html body .fc-day, html body .fc-row { background: transparent !important; border-color: var(--border) !important; color: var(--foreground) !important; }
+html body .fc-today { background: var(--muted) !important; }
+html body .fc-button { background: var(--background) !important; color: var(--foreground) !important; border: 1px solid var(--input) !important; text-shadow: none !important; box-shadow: none !important; }
+html body .fc-state-active { background: var(--accent) !important; }
+html body .email-collection, html body .mailbox-messages, html body .mailbox-read-info { background: var(--card) !important; color: var(--card-foreground) !important; border-color: var(--border) !important; }
+html body .font-white { color: var(--foreground) !important; }
+html body .collapsed.btn, html body a.btn-default { color: var(--foreground) !important; }
+
+/* vary stat-chip tints by position, like the reference */
+html body .row > div:nth-child(5n+2) .topprograssstart p > i:first-child, html body .row > div:nth-child(5n+2) .info-box-icon { background: var(--tint-green) !important; color: var(--tint-green-fg) !important; }
+html body .row > div:nth-child(5n+3) .topprograssstart p > i:first-child, html body .row > div:nth-child(5n+3) .info-box-icon { background: var(--tint-rose) !important; color: var(--tint-rose-fg) !important; }
+html body .row > div:nth-child(5n+4) .topprograssstart p > i:first-child, html body .row > div:nth-child(5n+4) .info-box-icon { background: var(--tint-amber) !important; color: var(--tint-amber-fg) !important; }
+html body .row > div:nth-child(5n+5) .topprograssstart p > i:first-child, html body .row > div:nth-child(5n+5) .info-box-icon { background: var(--tint-violet) !important; color: var(--tint-violet-fg) !important; }
+html body .row > div:nth-child(5n+1) .info-box-icon { background: var(--tint-blue) !important; color: var(--tint-blue-fg) !important; }
+
+/* ---------- re-point the legacy theme variables at the shadcn tokens ---------- */
+html body, html body.dark, html body.light-mode {
+  --bs-primary: var(--primary); --bs-primary-contrast: var(--primary-foreground); --bs-primary-hover: var(--primary);
+  --bs-hover-color: var(--foreground); --custom-hover-theme: var(--accent); --bs-btn-border-color: var(--primary);
+  --bs-primary-rgb-custom: var(--accent); --bs-menu-active-border: var(--foreground);
+  --bs-body-bg: var(--background); --bs-body-color: var(--foreground);
+  --bs-nav-bg: var(--background); --bs-side-nav-bg: var(--sidebar); --bs-footer-bg: var(--background); --bs-footer-color: var(--muted-foreground);
+  --bs-border-color: var(--border); --bs-with-border-color: var(--border); --bs-card-border-color: var(--border); --bs-card-border-light-gray: var(--border);
+  --bs-gray-border-color: var(--border); --bs-border-light: var(--border); --bs-hr-color: var(--border); --bs-divider: var(--border);
+  --bs-card-bg: var(--card); --bs-input-bg: transparent; --bs-alert-bg: var(--muted); --bs-slide-alert: var(--muted);
+  --bs-menu-color: var(--sidebar-foreground); --bs-menu-hover-bg: var(--sidebar-accent);
+  --bs-side-menu-bg: var(--popover); --bs-side-menu-color: var(--muted-foreground); --bs-side-tab-active: var(--accent);
+  --bs-side-navbar-vertical: var(--foreground); --bs-side-navbar-vertical-heading: var(--foreground); --bs-verticalmenu-bg: var(--popover);
+  --label-text-color: var(--foreground); --bs-text-muted: var(--muted-foreground);
+  --bs-table-bg: transparent; --bs-table-border: var(--border); --bs-table-heading: transparent; --bs-table-striped-bg: transparent;
+  --bs-progress-bg: var(--muted); --bs-pagination-bg: transparent; --bs-pagination-hover-bg: var(--accent);
+  --bs-fc-widget-header: transparent; --bs-fc-border: var(--border); --bs-fc-divider: var(--border); --bs-fc-widget-content: transparent; --bs-fc-today: var(--muted);
+  --bs-dropify-hover: var(--muted); --bs-heading-bg: transparent; --bs-tab-heading-bg: var(--muted);
+  --bs-fd-tab-content: var(--card); --bs-fd-tab-content-hover: var(--accent);
+  --bs-languge-dropdown-bg: var(--popover); --bs-languge-dropdown-bg-hover: var(--accent);
+  --bs-chat-hover: var(--accent); --bs-chat-color: var(--muted-foreground); --bs-chat-bg: var(--muted);
+  --bs-dark-bg: var(--muted); --bs-gray-bg-thin: var(--muted); --bs-ul-label-hover: var(--accent);
+  --theme-card-shadow: var(--shadow-sm); --bs-shadow: var(--shadow-sm); --bs-side-menu-shadow: none; --bs-box-shadow-sm: var(--shadow-sm);
+  --bs-scroll-bg: var(--border); --bs-sidebar-toggle-bar: var(--muted-foreground);
+}
+/* settings / profile vertical tab lists */
+html body .tablists > li > a { color: var(--muted-foreground) !important; border-radius: 8px; border: 0 !important; background: transparent !important; }
+html body .tablists > li > a:hover { color: var(--foreground) !important; background: var(--accent) !important; }
+html body .tablists > li > a.active, html body .tablists > li.active > a { color: var(--foreground) !important; background: var(--accent) !important; font-weight: 600; }
+html body .tablists > li { border-color: var(--border) !important; }
+
+/* ================= dashboard (reference layout) ================= */
+html body .st-welcome { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 4px 0 24px; }
+html body .st-welcome h1 { font-size: 28px; font-weight: 700 !important; letter-spacing: -.025em; margin: 0 0 6px; color: var(--foreground); }
+html body .st-welcome p { color: var(--muted-foreground) !important; font-size: 14.5px; margin: 0 0 10px; }
+html body .st-welcome-meta { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted-foreground); font-size: 13px; }
+html body .st-welcome-meta span { display: inline-flex; align-items: center; gap: 6px; }
+html body .st-welcome-actions { display: flex; gap: 8px; }
+html body .st-welcome-actions .btn { display: inline-flex !important; align-items: center; gap: 7px; height: 36px; }
+
+html body .st-card {
+  display: block; background: var(--card); color: var(--card-foreground); border: 1px solid var(--border);
+  border-radius: 14px; box-shadow: var(--shadow-sm); margin-bottom: 20px; transition: border-color .15s, background .15s;
+}
+html body a.st-card:hover { border-color: color-mix(in srgb, var(--foreground) 22%, transparent); opacity: 1 !important; }
+html body .st-chip {
+  width: 44px; height: 44px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; flex: none; font-size: 19px;
+}
+html body .st-tint-blue   { background: var(--tint-blue);   color: var(--tint-blue-fg); }
+html body .st-tint-green  { background: var(--tint-green);  color: var(--tint-green-fg); }
+html body .st-tint-rose   { background: var(--tint-rose);   color: var(--tint-rose-fg); }
+html body .st-tint-amber  { background: var(--tint-amber);  color: var(--tint-amber-fg); }
+html body .st-tint-violet { background: var(--tint-violet); color: var(--tint-violet-fg); }
+html body .st-label, html body .st-kpi-label { color: var(--muted-foreground); font-size: 12px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; }
+
+/* progress cards (top row) */
+html body .st-stat { padding: 24px 26px 22px; }
+html body .st-stat-head { display: flex; align-items: flex-start; gap: 16px; }
+html body .st-value { font-size: 26px; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; margin-top: 4px; color: var(--card-foreground); }
+html body .st-of { font-size: 14px; font-weight: 500; color: var(--muted-foreground); letter-spacing: 0; }
+html body .st-stat-foot { display: flex; justify-content: space-between; color: var(--muted-foreground); font-size: 12.5px; margin: 14px 0 8px 60px; }
+html body .st-bar { height: 6px; border-radius: 99px; background: var(--muted); overflow: hidden; margin-left: 60px; }
+html body .st-bar > span { display: block; height: 100%; border-radius: 99px; background: var(--foreground); opacity: .85; transition: width .6s ease; }
+
+/* KPI cards (second row) */
+html body .st-kpi { padding: 24px 26px; min-height: 172px; display: flex !important; flex-direction: column; color: var(--card-foreground) !important; text-decoration: none !important; }
+html body .st-kpi-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+html body .st-meta { color: var(--muted-foreground); font-size: 12.5px; padding-top: 4px; text-align: right; }
+html body .st-kpi-value { font-size: 34px; font-weight: 700; letter-spacing: -.03em; line-height: 1; margin-top: auto; padding-top: 22px; color: var(--card-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html body .st-kpi-label { margin-top: 8px; text-transform: none; letter-spacing: 0; font-size: 13.5px; }
+
+/* overview lists (Fees / Enquiry / Library / Attendance) */
+html body .row-flex3 .topprograssstart { padding: 22px 24px !important; }
+html body .row-flex3 .pro-border { font-size: 15px !important; font-weight: 600 !important; color: var(--card-foreground) !important; border-bottom: 1px solid var(--border) !important; padding-bottom: 12px; margin: 0 0 6px !important; }
+html body .row-flex3 .topprograssstart p { font-size: 12.5px !important; font-weight: 500; color: var(--muted-foreground) !important; margin: 12px 0 6px !important; display: flex; }
+html body .row-flex3 .topprograssstart p .pull-right { color: var(--card-foreground); font-size: 13px; font-weight: 600; }
+html body .row-flex3 .progress-group { margin: 0; }
+
+/* chart cards */
+html body .content .col60 .box, html body .content .col40 .box { border-radius: 14px !important; }
+html body .st-kpi-sm { min-height: 0; padding: 18px 20px; }
+html body .st-kpi-sm .st-chip { width: 34px; height: 34px; font-size: 16px; border-radius: 9px; }
+html body .st-kpi-sm .st-kpi-value { font-size: 26px; padding-top: 16px; }
+html body .st-kpi-sm .st-kpi-label { font-size: 12.5px; }
+
+/* dashboard charts */
+html body .st-chart-wrap { position: relative; height: 300px; }
+html body .col40 .st-chart-wrap { height: 300px; }
+@media (max-width: 767px) { html body .st-chart-wrap { height: 240px; } }
+
+/* Bootstrap contextual table rows (e.g. overdue enquiries = .danger): tinted row, readable text */
+html body .table > tbody > tr.danger > td, html body .table > tbody > tr > td.danger, html body .table > tbody > tr.danger > th { background: color-mix(in srgb, var(--destructive) 10%, transparent) !important; color: var(--card-foreground) !important; }
+html body .table > tbody > tr.warning > td, html body .table > tbody > tr > td.warning, html body .table > tbody > tr.warning > th { background: color-mix(in srgb, var(--tint-amber-fg) 10%, transparent) !important; color: var(--card-foreground) !important; }
+html body .table > tbody > tr.success > td, html body .table > tbody > tr > td.success, html body .table > tbody > tr.success > th { background: color-mix(in srgb, var(--tint-green-fg) 10%, transparent) !important; color: var(--card-foreground) !important; }
+html body .table > tbody > tr.info > td, html body .table > tbody > tr > td.info, html body .table > tbody > tr.info > th { background: color-mix(in srgb, var(--tint-blue-fg) 10%, transparent) !important; color: var(--card-foreground) !important; }
+html body .table > tbody > tr.active > td, html body .table > tbody > tr > td.active { background: var(--muted) !important; color: var(--card-foreground) !important; }
+html body .table > tbody > tr.danger:hover > td { background: color-mix(in srgb, var(--destructive) 16%, transparent) !important; }
+
+/* pagination current page + Bootstrap text colours, readable in both themes */
+html body .dt-paging .dt-paging-button, html body .dt-paging .dt-paging-button.current, html body .dt-paging .dt-paging-button.current:hover {
+  color: var(--foreground) !important; background: transparent !important; min-width: 32px; height: 32px;
+}
+html body .dt-paging .dt-paging-button.current { border: 1px solid var(--input) !important; background: var(--background) !important; }
+html body .text-success { color: var(--success) !important; }
+html body .text-info, html body .text-primary { color: var(--tint-blue-fg) !important; }
+html body .text-warning { color: var(--tint-amber-fg) !important; }
+html body .text-dark, html body .text-black { color: var(--foreground) !important; }
