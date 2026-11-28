@@ -31,6 +31,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 $st_allowed_hosts = array('localhost', '127.0.0.1', 'shuletech.co.ke', 'www.shuletech.co.ke');
 $st_default_url   = 'https://shuletech.co.ke/';
+// The web installer writes the site's own hosts and address here (not in git).
+if (is_file(APPPATH . 'config/shuletech_hosts.php')) {
+    $st_site = include APPPATH . 'config/shuletech_hosts.php';
+    if (is_array($st_site)) {
+        $st_allowed_hosts = array_values(array_unique(array_merge($st_allowed_hosts, (array) ($st_site['hosts'] ?? array()))));
+        $st_default_url   = !empty($st_site['default_url']) ? $st_site['default_url'] : $st_default_url;
+    }
+}
 $st_host = isset($_SERVER['HTTP_HOST']) ? strtolower(preg_replace('/:\d+$/', '', $_SERVER['HTTP_HOST'])) : '';
 if ($st_host !== '' && in_array($st_host, $st_allowed_hosts, true)) {
     $st_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
