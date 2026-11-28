@@ -544,3 +544,10 @@ html body .text-success { color: var(--success) !important; }
 html body .text-info, html body .text-primary { color: var(--tint-blue-fg) !important; }
 html body .text-warning { color: var(--tint-amber-fg) !important; }
 html body .text-dark, html body .text-black { color: var(--foreground) !important; }
+
+/* SHULETECH: logo light/dark variants (st_logo_imgs helper) */
+.st-logo-dark { display: none !important; }
+html.st-dark .st-logo-dark { display: inline-block !important; }
+html.st-dark .st-logo-light.has-dark { display: none !important; }
+html body .main-header .logo .logo-lg img { max-height: 30px; width: auto; vertical-align: middle; }
+html body .main-header .logo .logo-mini img { max-height: 30px; width: auto; vertical-align: middle; }

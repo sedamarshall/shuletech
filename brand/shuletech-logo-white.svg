@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 196 40" width="980" height="200">
+  <title>ShuleTech</title>
+  <style>@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@800&amp;display=swap'); text { font-family: 'Inter Tight', Inter, 'Segoe UI', Arial, sans-serif; font-weight: 800; font-size: 29px; letter-spacing: -0.6px; }</style>
+  <path d="M22 3 42 11 22 19 2 11z" fill="#FFFFFF"/><path d="M11 15v7c0 3 5 6 11 6s11-3 11-6v-7l-11 4.5z" fill="#FFFFFF"/><path d="M6 12.5v9" stroke="#FF7900" stroke-width="1.8" stroke-linecap="round"/><path d="M4.6 21.5h2.8l.6 4h-4z" fill="#FF7900"/><path d="M3 33c10 6 27 5 38-6" stroke="#FF7900" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+  <text x="50" y="30"><tspan fill="#FFFFFF">Shule</tspan><tspan fill="#FF7900">Tech</tspan></text>
+</svg>

@@ -1,272 +1,189 @@
 <?php
-defined('BASEPATH') or exit('No direct script access allowed');
+if (!defined('BASEPATH')) {
+    exit('No direct script access allowed');
+}
+
+/**
+ * SHULETECH: Safaricom Daraja "Lipa na M-Pesa Online" (STK push) client.
+ *
+ * Settings come from payment_settings (payment_type = 'mpesa'):
+ *   api_username        consumer key
+ *   api_secret_key      consumer secret
+ *   api_publishable_key business short code (paybill, or the store number for a till)
+ *   api_password        Lipa na M-Pesa passkey
+ *   salt                till number (Buy Goods only; empty for paybill)
+ *   api_signature       transaction type: CustomerPayBillOnline | CustomerBuyGoodsOnline
+ *   gateway_mode        sandbox | live
+ */
 class Mpesa_lib
 {
-	public $config;
+    private $CI;
+    private $cfg;
 
-	function __construct(array $configs = array())
-	{
-		$defaults = array(
-			'env'               => 'sandbox',
-			'type'              => 4,
-			'shortcode'         => '174379',
-			'headoffice'        => '174379',
-			'key'               => 'WiGveilGB2SKbXWi9IShIHDK7XfCtvWK',
-			'secret'            => 'mJBnR94sTlGFUkvM',
-			'passkey'           => 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919',
-			'validation_url'    => '/pesa/validate',
-			'confirmation_url'  => '/pesa/confirm',
-			'callback_url'      => '/pesa/reconcile',
-			'timeout_url'       => '/pesa/timeout',
-			'results_url'       => '/pesa/results',
-		);
+    public function __construct()
+    {
+        $this->CI = &get_instance();
+        $this->CI->load->model('paymentsetting_model');
+        $this->cfg = $this->CI->paymentsetting_model->getByType('mpesa');
+    }
 
-		if (!isset($configs['headoffice']) || empty($configs['headoffice'])) {
-			$defaults['headoffice'] = $configs['shortcode'];
-		}
+    public function isConfigured()
+    {
+        return $this->cfg && $this->cfg->api_username !== '' && $this->cfg->api_secret_key !== ''
+            && $this->cfg->api_publishable_key !== '' && $this->cfg->api_password !== '';
+    }
 
-		$parsed = array_merge($defaults, $configs);
+    public function settings()
+    {
+        return $this->cfg;
+    }
 
-		$this->config 	= (object)$parsed;
-	}
+    private function baseUrl()
+    {
+        return ($this->cfg && $this->cfg->gateway_mode === 'live') ? 'https://api.safaricom.co.ke' : 'https://sandbox.safaricom.co.ke';
+    }
 
-	/**
-	 * @return string Access token
-	 */
-	public function token()
-	{
-		$endpoint = ($this->config->env == 'live')
-			? 'https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
-			: 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
+    /** Normalise 07XXXXXXXX / 01XXXXXXXX / +2547... / 2547... to 2547XXXXXXXX (or 2541...). Returns '' if invalid. */
+    public static function normalisePhone($phone)
+    {
+        $p = preg_replace('/\D+/', '', (string) $phone);
+        if (strlen($p) === 10 && $p[0] === '0') {
+            $p = '254' . substr($p, 1);
+        } elseif (strlen($p) === 9 && ($p[0] === '7' || $p[0] === '1')) {
+            $p = '254' . $p;
+        }
+        return preg_match('/^254[17]\d{8}$/', $p) ? $p : '';
+    }
 
-		$credentials = base64_encode($this->config->key . ':' . $this->config->secret);
-		$curl = curl_init();
-		curl_setopt($curl, CURLOPT_URL, $endpoint);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, array('Authorization: Basic ' . $credentials));
-		curl_setopt($curl, CURLOPT_HEADER, false);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-		$curl_response = curl_exec($curl);
-		$result = json_decode($curl_response);
+    private function request($method, $path, $body = null, $token = null)
+    {
+        $ch = curl_init($this->baseUrl() . $path);
+        $headers = ['Accept: application/json'];
+        if ($token) {
+            $headers[] = 'Authorization: Bearer ' . $token;
+        } else {
+            $headers[] = 'Authorization: Basic ' . base64_encode($this->cfg->api_username . ':' . $this->cfg->api_secret_key);
+        }
+        if ($body !== null) {
+            $headers[] = 'Content-Type: application/json';
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+        }
+        curl_setopt_array($ch, [
+            CURLOPT_HTTPHEADER     => $headers,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+        ]);
+        $raw  = curl_exec($ch);
+        $err  = curl_error($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($raw === false) {
+            return ['ok' => false, 'http' => 0, 'error' => 'Could not reach Safaricom: ' . $err, 'data' => null];
+        }
+        $data = json_decode($raw, true);
+        return ['ok' => $code >= 200 && $code < 300, 'http' => $code, 'error' => is_array($data) ? ($data['errorMessage'] ?? ($data['ResponseDescription'] ?? '')) : substr($raw, 0, 200), 'data' => $data];
+    }
 
-		return isset($result->access_token) ? $result->access_token : '';
-	}
+    /** OAuth access token (cached in the session for 50 minutes). */
+    public function token()
+    {
+        $cacheKey = 'mpesa_token_' . md5($this->cfg->api_username . $this->cfg->gateway_mode);
+        $cached   = $this->CI->session->userdata($cacheKey);
+        if (is_array($cached) && $cached['exp'] > time()) {
+            return $cached['token'];
+        }
+        $r = $this->request('GET', '/oauth/v1/generate?grant_type=client_credentials');
+        if (!$r['ok'] || empty($r['data']['access_token'])) {
+            return null;
+        }
+        $this->CI->session->set_userdata($cacheKey, ['token' => $r['data']['access_token'], 'exp' => time() + 3000]);
+        return $r['data']['access_token'];
+    }
 
-	/**
-	 * @param callable $callback Defined function or closure to process data and return true/false
-	 * 
-	 * @return array
-	 */
-	public function validate($callback = null)
-	{
-		$data = json_decode(file_get_contents('php://input'), true);
-		if (!$data) {
-			return array('ResultCode' => 1, 'ResultDesc' => 'No data received');
-		}
+    private function password($timestamp)
+    {
+        return base64_encode($this->cfg->api_publishable_key . $this->cfg->api_password . $timestamp);
+    }
 
-		if (is_null($callback)) {
-			return array('ResultCode' => 0, 'ResultDesc' => 'Success');
-		} else {
-			return call_user_func_array($callback, array($data))
-				? array('ResultCode' => 0, 'ResultDesc' => 'Success')
-				: array('ResultCode' => 1, 'ResultDesc' => 'Failed');
-		}
-	}
+    /** Send the payment prompt to the payer's phone. */
+    public function stkPush($phone, $amount, $accountRef, $description, $callbackUrl)
+    {
+        $token = $this->token();
+        if (!$token) {
+            return ['ok' => false, 'error' => 'M-Pesa authentication failed. Check the consumer key and secret.'];
+        }
+        $ts      = date('YmdHis');
+        $buyGoods = $this->cfg->api_signature === 'CustomerBuyGoodsOnline';
+        $partyB  = ($buyGoods && trim((string) $this->cfg->salt) !== '') ? trim($this->cfg->salt) : $this->cfg->api_publishable_key;
+        $body = [
+            'BusinessShortCode' => $this->cfg->api_publishable_key,
+            'Password'          => $this->password($ts),
+            'Timestamp'         => $ts,
+            'TransactionType'   => $buyGoods ? 'CustomerBuyGoodsOnline' : 'CustomerPayBillOnline',
+            'Amount'            => (int) $amount,
+            'PartyA'            => $phone,
+            'PartyB'            => $partyB,
+            'PhoneNumber'       => $phone,
+            'CallBackURL'       => $callbackUrl,
+            'AccountReference'  => substr(preg_replace('/[^A-Za-z0-9]/', '', $accountRef), 0, 12),
+            'TransactionDesc'   => substr($description, 0, 13),
+        ];
+        $r = $this->request('POST', '/mpesa/stkpush/v1/processrequest', $body, $token);
+        if ($r['ok'] && isset($r['data']['ResponseCode']) && (string) $r['data']['ResponseCode'] === '0') {
+            return ['ok' => true, 'merchant_request_id' => $r['data']['MerchantRequestID'], 'checkout_request_id' => $r['data']['CheckoutRequestID'],
+                    'message' => $r['data']['CustomerMessage'] ?? ''];
+        }
+        return ['ok' => false, 'error' => $r['error'] ?: 'M-Pesa did not accept the request.'];
+    }
 
-	/**
-	 * @param callable $callback Defined function or closure to process data and return true/false
-	 * 
-	 * @return array
-	 */
-	public function confirm($callback = null)
-	{
-		$data = json_decode(file_get_contents('php://input'), true);
-		if (!$data) {
-			return array('ResultCode' => 1, 'ResultDesc' => 'No data received');
-		}
+    /**
+     * Ask Safaricom for the outcome of a prompt.
+     * Returns state: 'success' | 'failed' | 'cancelled' | 'pending', plus code/desc.
+     */
+    public function stkQuery($checkoutRequestId)
+    {
+        $token = $this->token();
+        if (!$token) {
+            return ['state' => 'pending', 'code' => null, 'desc' => 'auth'];
+        }
+        $ts = date('YmdHis');
+        $r  = $this->request('POST', '/mpesa/stkpushquery/v1/query', [
+            'BusinessShortCode' => $this->cfg->api_publishable_key,
+            'Password'          => $this->password($ts),
+            'Timestamp'         => $ts,
+            'CheckoutRequestID' => $checkoutRequestId,
+        ], $token);
+        $d = $r['data'];
+        if (is_array($d) && isset($d['ResultCode'])) {
+            $code = (string) $d['ResultCode'];
+            $desc = $d['ResultDesc'] ?? '';
+            if ($code === '0') {
+                return ['state' => 'success', 'code' => $code, 'desc' => $desc];
+            }
+            if ($code === '1032') {
+                return ['state' => 'cancelled', 'code' => $code, 'desc' => $desc];
+            }
+            return ['state' => 'failed', 'code' => $code, 'desc' => $desc];
+        }
+        // "The transaction is being processed" comes back as an error until the payer responds
+        return ['state' => 'pending', 'code' => null, 'desc' => is_array($d) ? ($d['errorMessage'] ?? '') : ''];
+    }
 
-		if (is_null($callback)) {
-			return array('ResultCode' => 0, 'ResultDesc' => 'Success');
-		} else {
-			return call_user_func_array($callback, array($data))
-				? array('ResultCode' => 0, 'ResultDesc' => 'Success')
-				: array('ResultCode' => 1, 'ResultDesc' => 'Failed');
-		}
-	}
+    /** Signed callback URL so Safaricom callbacks can't be forged for other transactions. */
+    public function callbackUrl($txnId)
+    {
+        return base_url('mpesa_callback/stk/' . (int) $txnId . '/' . self::sign($txnId));
+    }
 
-	/**
-	 * @param callable $callback Defined function or closure to process data and return true/false
-	 * 
-	 * @return array
-	 */
-	public function reconcile($callback = null)
-	{
-		$data = json_decode(file_get_contents('php://input'), true);
-		if (!$data) {
-			return array('ResultCode' => 1, 'ResultDesc' => 'No data received');
-		}
-
-		if (is_null($callback)) {
-			return array('ResultCode' => 0, 'ResultDesc' => 'Success');
-		} else {
-			return call_user_func_array($callback, array($data))
-				? array('ResultCode' => 0, 'ResultDesc' => 'Success')
-				: array('ResultCode' => 1, 'ResultDesc' => 'Failed');
-		}
-	}
-
-	/**
-	 * @param callable $callback Defined function or closure to process data and return true/false
-	 * 
-	 * @return array
-	 */
-	public function register($callback = null)
-	{
-		$token      = $this->token();
-		$endpoint   = ($this->config->env == 'live')
-			? 'https://api.safaricom.co.ke/mpesa/c2b/v1/registerurl'
-			: 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl';
-
-		$curl       = curl_init();
-		curl_setopt($curl, CURLOPT_URL, $endpoint);
-		curl_setopt(
-			$curl,
-			CURLOPT_HTTPHEADER,
-			array(
-				'Content-Type:application/json',
-				'Authorization:Bearer ' . $token
-			)
-		);
-
-		$curl_post_data = array(
-			'ShortCode' 		=> $this->config->shortcode,
-			'ResultType' 		=> 'Cancelled',
-			'ConfirmationURL' 	=> $this->config->confirmation_url,
-			'ValidationURL' 	=> $this->config->validation_url
-		);
-		$data_string = json_encode($curl_post_data);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl, CURLOPT_POST, true);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-		curl_setopt($curl, CURLOPT_HEADER, false);
-		$response   = curl_exec($curl);
-		$content    = json_decode($response, true);
-
-		if (is_null($callback)) {
-			if ($response) {
-				if (isset($content['ResultDescription'])) {
-					$status = $content['ResultDescription'];
-				} elseif (isset($content['errorMessage'])) {
-					$status = $content['errorMessage'];
-				} else {
-					$status = 'Sorry could not connect to Daraja. Check your connection/configuration and try again.';
-				}
-			}
-
-			return array('Registration status' => $status);
-		} else {
-			return \call_user_func_array($callback, $content);
-		}
-	}
-
-	/**
-	 * @param $phone The MSISDN sending the funds.
-	 * @param $amount The amount to be transacted.
-	 * @param $reference Used with M-Pesa PayBills.
-	 * 
-	 * @return array Response
-	 */
-	public function simulate($phone, $amount = 10, $reference = 'TRX')
-	{
-		$token = $this->token();
-		$phone = (substr($phone, 0, 1) == '+') ? str_replace('+', '', $phone) : $phone;
-		$phone = (substr($phone, 0, 1) == '0') ? preg_replace('/^0/', '254', $phone) : $phone;
-
-		$endpoint = ($this->config->env == 'live')
-			? 'https://api.safaricom.co.ke/mpesa/c2b/v1/simulate'
-			: 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/simulate';
-
-		$curl = curl_init();
-		curl_setopt($curl, CURLOPT_URL, $endpoint);
-		curl_setopt(
-			$curl,
-			CURLOPT_HTTPHEADER,
-			array(
-				'Content-Type:application/json',
-				'Authorization:Bearer ' . $token
-			)
-		);
-		$curl_post_data     = array(
-			'ShortCode'     => $this->config->shortcode,
-			'CommandID'     => ($this->config->type == 4) ? 'CustomerPayBillOnline' : 'CustomerBuyGoodsOnline',
-			'Amount'        => round($amount),
-			'Msisdn'        => $phone,
-			'BillRefNumber' => $reference
-		);
-		$data_string        = json_encode($curl_post_data);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl, CURLOPT_POST, true);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-		curl_setopt($curl, CURLOPT_HEADER, false);
-		$curl_response = curl_exec($curl);
-		$response = curl_exec($curl);
-
-		return json_decode($response, true);
-	}
-
-	/**
-	 * @param $phone The MSISDN sending the funds.
-	 * @param $amount The amount to be transacted.
-	 * @param $reference Used with M-Pesa PayBills.
-	 * @param $description A description of the transaction.
-	 * @param $remark Remarks
-	 * 
-	 * @return array Response
-	 */
-	public function request($phone, $amount, $reference = 'ACCOUNT', $description = 'Transaction Description', $remark = 'Remark')
-	{
-		$token      = $this->token();
-
-		$phone      = (substr($phone, 0, 1) == '+') ? str_replace('+', '', $phone) : $phone;
-		$phone      = (substr($phone, 0, 1) == '0') ? preg_replace('/^0/', '254', $phone) : $phone;
-		$timestamp  = date('YmdHis');
-		$password   = base64_encode($this->config->shortcode . $this->config->passkey . $timestamp);
-
-		$endpoint   = ($this->config->env == 'live')
-			? 'https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
-			: 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
-
-		$curl = curl_init();
-		curl_setopt($curl, CURLOPT_URL, $endpoint);
-		curl_setopt(
-			$curl,
-			CURLOPT_HTTPHEADER,
-			array(
-				'Content-Type:application/json',
-				'Authorization:Bearer ' . $token
-			)
-		);
-		$curl_post_data = array(
-			'BusinessShortCode' => $this->config->headoffice,
-			'Password' 			=> $password,
-			'Timestamp' 		=> $timestamp,
-			'TransactionType' 	=> ($this->config->type == 4) ? 'CustomerPayBillOnline' : 'CustomerBuyGoodsOnline',
-			'Amount' 			=> round($amount),
-			'PartyA' 			=> $phone,
-			'PartyB' 			=> $this->config->shortcode,
-			'PhoneNumber' 		=> $phone,
-			'CallBackURL' 		=> $this->config->callback_url,
-			'AccountReference' 	=> $reference,
-			'TransactionDesc' 	=> $description,
-			'Remark'			=> $remark
-		);
-		$data_string = json_encode($curl_post_data);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl, CURLOPT_POST, true);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-		curl_setopt($curl, CURLOPT_HEADER, false);
-		$response = curl_exec($curl);
-
-		return json_decode($response, true);
-	}
+    public static function sign($txnId)
+    {
+        $CI = &get_instance();
+        $CI->config->load('shuletech_security', true);
+        $key = (string) $CI->config->item('link_signing_key', 'shuletech_security');
+        return substr(hash_hmac('sha256', 'mpesa-callback|' . (int) $txnId, $key), 0, 32);
+    }
 }

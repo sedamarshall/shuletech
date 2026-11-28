@@ -12,7 +12,7 @@ class Paystack extends Studentgateway_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->api_config = $this->paymentsetting_model->getActiveMethod();
+        $this->api_config = $this->paymentsetting_model->getByType('paystack'); // SHULETECH: works when M-Pesa is also on
         $this->setting    = $this->setting_model->get();
         $this->setting[0]['currency_symbol'] = $this->customlib->getSchoolCurrencyFormat();
         $this->load->library('mailsmsconf');

@@ -1003,4 +1003,79 @@ class Paymentsettings extends Admin_Controller
         }
     }
 
+
+    /* ===================== SHULETECH: M-Pesa + enabled methods ===================== */
+
+    public function mpesa()
+    {
+        if (!$this->rbac->hasPrivilege('payment_methods', 'can_edit')) {
+            access_denied();
+        }
+        $this->form_validation->set_error_delimiters('', '');
+        $this->form_validation->set_rules('mpesa_consumer_key', 'Consumer key', 'trim|required');
+        $this->form_validation->set_rules('mpesa_consumer_secret', 'Consumer secret', 'trim|required');
+        $this->form_validation->set_rules('mpesa_shortcode', 'Business short code', 'trim|required|numeric');
+        $this->form_validation->set_rules('mpesa_passkey', 'Passkey', 'trim|required');
+        $this->form_validation->set_rules('mpesa_type', 'Account type', 'trim|required|in_list[CustomerPayBillOnline,CustomerBuyGoodsOnline]');
+        $this->form_validation->set_rules('mpesa_mode', 'Environment', 'trim|required|in_list[sandbox,live]');
+        if ($this->input->post('mpesa_type') === 'CustomerBuyGoodsOnline') {
+            $this->form_validation->set_rules('mpesa_till', 'Till number', 'trim|required|numeric');
+        }
+        if ($this->input->post('charge_type') != 'none' && $this->input->post('charge_type') != '') {
+            $this->form_validation->set_rules('mpesa_charge_value', $this->lang->line('percentage_fix_amount'), 'trim|required|numeric');
+        }
+        if ($this->form_validation->run()) {
+            $this->paymentsetting_model->add(array(
+                'payment_type'        => 'mpesa',
+                'api_username'        => $this->input->post('mpesa_consumer_key'),
+                'api_secret_key'      => $this->input->post('mpesa_consumer_secret'),
+                'api_publishable_key' => $this->input->post('mpesa_shortcode'),
+                'api_password'        => $this->input->post('mpesa_passkey'),
+                'api_signature'       => $this->input->post('mpesa_type'),
+                'salt'                => $this->input->post('mpesa_type') === 'CustomerBuyGoodsOnline' ? $this->input->post('mpesa_till') : '',
+                'gateway_mode'        => $this->input->post('mpesa_mode'),
+                'charge_type'         => $this->input->post('charge_type'),
+                'charge_value'        => $this->input->post('mpesa_charge_value'),
+            ));
+            echo json_encode(array('st' => 0, 'msg' => $this->lang->line('update_message')));
+        } else {
+            echo json_encode(array('st' => 1, 'msg' => array(
+                'mpesa_consumer_key'    => form_error('mpesa_consumer_key'),
+                'mpesa_consumer_secret' => form_error('mpesa_consumer_secret'),
+                'mpesa_shortcode'       => form_error('mpesa_shortcode'),
+                'mpesa_passkey'         => form_error('mpesa_passkey'),
+                'mpesa_till'            => form_error('mpesa_till'),
+                'mpesa_type'            => form_error('mpesa_type'),
+                'mpesa_mode'            => form_error('mpesa_mode'),
+                'mpesa_charge_value'    => form_error('mpesa_charge_value'),
+            )));
+        }
+    }
+
+    /** Which methods parents can use: any of paystack / mpesa, each only once its details are saved. */
+    public function enabled()
+    {
+        if (!$this->rbac->hasPrivilege('payment_methods', 'can_edit')) {
+            access_denied();
+        }
+        $wanted  = (array) $this->input->post('enabled');
+        $allowed = array();
+        $missing = array();
+        foreach (array('paystack' => 'Paystack', 'mpesa' => 'M-Pesa') as $type => $label) {
+            if (!in_array($type, $wanted, true)) {
+                continue;
+            }
+            if ($this->paymentsetting_model->check_data_exists($type)) {
+                $allowed[] = $type;
+            } else {
+                $missing[] = $label;
+            }
+        }
+        if ($missing) {
+            echo json_encode(array('st' => 1, 'msg' => array('enabled' => 'Save the ' . implode(' and ', $missing) . ' details first.')));
+            return;
+        }
+        $this->paymentsetting_model->setEnabledTypes($allowed);
+        echo json_encode(array('st' => 0, 'msg' => $this->lang->line('update_message')));
+    }
 }

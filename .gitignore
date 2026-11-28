@@ -24,3 +24,6 @@
 
 # Firebase / Google service-account key (push notifications)
 /application/third_party/firebase_notification_key.json
+
+# generated login captcha images
+/backend/captcha_images/*.jpg

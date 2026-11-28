@@ -173,8 +173,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap">
     <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-font.css?v=3">
-    <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-icons.css?v=1">
-    <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-ui.css?v=11">
+    <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-icons.css?v=2">
+    <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-ui.css?v=12">
     <script>(function(){var d=document.documentElement,t=null;try{t=localStorage.getItem("st-theme")}catch(e){}if(t!=="light"){d.classList.add("st-dark")}window.stToggleTheme=function(){var on=d.classList.toggle("st-dark");try{localStorage.setItem("st-theme",on?"dark":"light")}catch(e){}document.dispatchEvent(new Event("st-themechange"))}})();</script>
 </head>
 	
@@ -199,8 +199,8 @@ if ($this->config->item('SSLK') == "") {
 			  ?>
             <header class="main-header" id="alert">
                 <a href="<?php echo base_url(); ?>admin/admin/dashboard" class="logo">
-                    <span class="logo-mini"><img src="<?php echo $this->customlib->getBaseUrl(); ?>uploads/school_content/admin_small_logo/<?php echo $this->setting_model->getAdminsmalllogo() . img_time();?>" alt="<?php echo $this->customlib->getAppName() ?>" /></span>
-                    <span class="logo-lg"><img src="<?php echo $this->customlib->getBaseUrl(); ?>uploads/school_content/admin_logo/<?php echo $this->setting_model->getAdminlogo() . img_time();?>" alt="<?php echo $this->customlib->getAppName() ?>" /></span>
+                    <span class="logo-mini"><?php echo st_logo_imgs('admin_small_logo', $this->setting_model->getAdminsmalllogo(), $this->customlib->getAppName()); ?>customlib->getAppName() ?>" /></span>
+                    <span class="logo-lg"><?php echo st_logo_imgs('admin_logo', $this->setting_model->getAdminlogo(), $this->customlib->getAppName()); ?>customlib->getAppName() ?>" /></span>
                 </a>
                 <nav class="navbar navbar-static-top" role="navigation">
                     <a onclick="collapseSidebar()"  class="sidebar-toggle" data-toggle="offcanvas" role="button">

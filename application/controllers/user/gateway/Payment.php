@@ -241,6 +241,7 @@ class Payment extends Studentgateway_Controller
                 );
                 //=================
 
+                $this->st_route_mpesa($params); // SHULETECH: M-Pesa / choose-method step
                 if ($pay_method->payment_type == "payu") {
                     if ($pay_method->api_secret_key == "") {
                         $this->session->set_flashdata('error', '<div class="alert alert-danger">' . $this->lang->line('payu_settings_not_available') . '</div>');
@@ -901,6 +902,7 @@ class Payment extends Studentgateway_Controller
 
                     }
                     //=====================================
+                    $this->st_route_mpesa($params); // SHULETECH: M-Pesa / choose-method step
                     if ($pay_method->payment_type == "paypal") {
                         //==========Start Paypal==========
                         if ($pay_method->api_username == "" || $pay_method->api_password == "" || $pay_method->api_signature == "") {
@@ -1227,6 +1229,7 @@ class Payment extends Studentgateway_Controller
                 'student_fees_master_array' => $fees_master_array,
             );
             //=====================================
+            $this->st_route_mpesa($params); // SHULETECH: M-Pesa / choose-method step
             if ($pay_method->payment_type == "paypal") {
                 //==========Start Paypal==========
                 if ($pay_method->api_username == "" || $pay_method->api_password == "" || $pay_method->api_signature == "") {
@@ -1422,5 +1425,22 @@ class Payment extends Studentgateway_Controller
         $this->load->view('layout/student/header', $data);
         $this->load->view('user/invoice', $data);
         $this->load->view('layout/student/footer', $data);
+    }
+
+    /**
+     * SHULETECH: when M-Pesa is switched on, send the payer to M-Pesa (or to the
+     * "M-Pesa or card" choice when Paystack is on too). Otherwise fall through to Smart School's chain.
+     */
+    private function st_route_mpesa($params)
+    {
+        $enabled = $this->paymentsetting_model->getEnabledTypes();
+        if (!in_array('mpesa', $enabled, true)) {
+            return;
+        }
+        $this->session->set_userdata('params', $params);
+        if (in_array('paystack', $enabled, true)) {
+            redirect(base_url('user/gateway/mpesa/choose'));
+        }
+        redirect(base_url('user/gateway/mpesa'));
     }
 }

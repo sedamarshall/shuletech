@@ -19,7 +19,7 @@ $map = [
  'remove'=>'x','close'=>'x','times'=>'x','times-circle'=>'circle-x','times-circle-o'=>'circle-x',
  'pencil'=>'pencil','edit'=>'square-pen','pencil-square'=>'square-pen','pencil-square-o'=>'square-pen',
  'plus'=>'plus','plus-square-o'=>'square-plus','plus-circle'=>'circle-plus','minus'=>'minus','minus-circle'=>'circle-minus',
- 'money'=>'banknote','usd'=>'dollar-sign','dollar'=>'dollar-sign','credit-card'=>'credit-card','calculator'=>'calculator',
+ 'money'=>'banknote','usd'=>'hand-coins','dollar'=>'hand-coins','credit-card'=>'credit-card','calculator'=>'calculator',
  'users'=>'users','user'=>'user','user-plus'=>'user-plus','user-secret'=>'user-cog','user-circle'=>'circle-user','user-md'=>'stethoscope',
  'download'=>'download','upload'=>'upload','cloud-upload'=>'cloud-upload','cloud-download'=>'cloud-download',
  'file'=>'file','file-o'=>'file','file-text'=>'file-text','file-text-o'=>'file-text','files-o'=>'files','copy'=>'copy',

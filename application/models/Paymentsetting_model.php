@@ -22,10 +22,38 @@ class Paymentsetting_model extends MY_Model {
     }
 
     public function getActiveMethod() {
+        // SHULETECH: Paystack and M-Pesa can both be enabled; prefer a non-M-Pesa row here because
+        // the rest of Smart School expects one "card" gateway. M-Pesa is routed separately.
         $this->db->select()->from('payment_settings');
         $this->db->where('is_active', 'yes');
+        $this->db->order_by("payment_type = 'mpesa'", 'ASC', false);
+        $this->db->limit(1);
         $query = $this->db->get();
         return $query->row();
+    }
+
+    /** SHULETECH: settings row for one gateway (or null). */
+    public function getByType($type) {
+        $query = $this->db->get_where('payment_settings', array('payment_type' => $type), 1);
+        return $query->row();
+    }
+
+    /** SHULETECH: payment types that are switched on, e.g. ['paystack', 'mpesa']. */
+    public function getEnabledTypes() {
+        $types = array();
+        foreach ($this->db->select('payment_type')->get_where('payment_settings', array('is_active' => 'yes'))->result() as $row) {
+            $types[] = $row->payment_type;
+        }
+        return $types;
+    }
+
+    /** SHULETECH: switch on exactly these gateways (others off). */
+    public function setEnabledTypes(array $types) {
+        $this->db->update('payment_settings', array('is_active' => 'no'));
+        if (!empty($types)) {
+            $this->db->where_in('payment_type', $types);
+            $this->db->update('payment_settings', array('is_active' => 'yes'));
+        }
     }
 
     public function add($data) {
