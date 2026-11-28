@@ -89,7 +89,7 @@ $staff = (int) $m->query('SELECT COUNT(*) FROM staff')->fetch_row()[0];
 if ($staff !== 1) { $problems[] = "staff ($staff rows, expected only the admin)"; }
 if ($problems) { fail("the local database has data that would be shipped: " . implode(', ', $problems) . ". Remove it locally first (test data: seed_test_data.php --remove)."); }
 
-$sqlgz = tempnam(sys_get_temp_dir(), 'stsql');
+$sqlgz = "$root/install/sql/shuletech.sql.gz";   // git-ignored; removed again after the build
 $dump = $exe('mysqldump') . " $auth --single-transaction --skip-comments --skip-dump-date --default-character-set=utf8mb4 $tmpdb";
 $pipe = popen($dump . ' 2>&1', 'r');
 $gz = gzopen($sqlgz, 'wb9');
@@ -99,24 +99,28 @@ gzclose($gz);
 if (pclose($pipe) !== 0 || $bytes < 100000) { fail('database export failed'); }
 say('clean database: ' . round($bytes / 1024) . ' KB uncompressed');
 
-/* ---------- 3. zip ---------- */
-@unlink($out);
-$zip = new ZipArchive();
-if ($zip->open($out, ZipArchive::CREATE) !== true) { fail("cannot create $out"); }
-foreach ($code as $f) { $zip->addFile("$root/$f", $f); }
-$zip->addFile($sqlgz, 'install/sql/shuletech.sql.gz');
+/* ---------- 3. zip (Windows tar / bsdtar: far faster than ZipArchive for ~40k files) ---------- */
+$list = $code;
+$list[] = 'install/sql/shuletech.sql.gz';
 // default uploads (logos, login images, default photos) - but no generated student barcodes/QR codes
-$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator("$root/uploads", FilesystemIterator::SKIP_DOTS));
+$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator("$root/uploads", FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST);
 $up = 0;
 foreach ($it as $file) {
-    $rel = 'uploads/' . str_replace('\\', '/', substr($file->getPathname(), strlen("$root/uploads/")));
+    $rel = 'uploads/' . str_replace(chr(92), '/', substr($file->getPathname(), strlen($root . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR)));
+    if ($file->isDir()) { $list[] = $rel; continue; }
     if (preg_match('#/(barcodes|qrcode)/#', $rel) && basename($rel) !== 'index.html') { continue; }
-    $zip->addFile($file->getPathname(), $rel);
+    $list[] = $rel;
     $up++;
 }
-// empty writable folders the app expects
-foreach (['temp', 'application/cache', 'application/logs', 'backend/captcha_images'] as $d) { $zip->addEmptyDir($d); }
-$zip->close();
+// writable folders the app expects (added empty - no logs/cache contents)
+foreach (['uploads', 'temp', 'application/cache', 'application/logs', 'backend/captcha_images'] as $d) { if (is_dir("$root/$d")) { $list[] = $d; } }
+$listFile = tempnam(sys_get_temp_dir(), 'stlist');
+file_put_contents($listFile, implode("\n", array_unique($list)) . "\n");
+@unlink($out);
+$tar = is_file('C:/Windows/System32/tar.exe') ? '"C:' . chr(92) . 'Windows' . chr(92) . 'System32' . chr(92) . 'tar.exe"' : 'bsdtar';
+exec("$tar -a -c -n -f " . escapeshellarg($out) . ' -T ' . escapeshellarg($listFile) . ' 2>&1', $o, $rc);
+@unlink($listFile);
 @unlink($sqlgz);
+if ($rc !== 0 || !is_file($out)) { fail('zip failed: ' . implode(' ', array_slice($o, 0, 5))); }
 say("uploads: $up files");
-say('OK  ' . str_replace('\\', '/', $out) . '  (' . round(filesize($out) / 1048576, 1) . ' MB)');
+say('OK  ' . str_replace(chr(92), '/', $out) . '  (' . round(filesize($out) / 1048576, 1) . ' MB)');
