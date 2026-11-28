@@ -81,6 +81,9 @@ class Site extends Public_Controller
         }
         $this->form_validation->set_rules('username', $this->lang->line('username'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('password', $this->lang->line('password'), 'trim|required|xss_clean');
+        if (st_turnstile_enabled()) { // SHULETECH: Cloudflare Turnstile, checked before the password
+            $this->form_validation->set_rules('cf-turnstile-response', 'Security check', 'callback_check_turnstile');
+        }
         if ($this->form_validation->run() == false) {
             $captcha               = $this->captchalib->generate_captcha();
             $data['captcha_image'] = isset($captcha['image']) ? $captcha['image'] : "";
@@ -480,6 +483,9 @@ class Site extends Public_Controller
         }
         $this->form_validation->set_rules('username', $this->lang->line('username'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('password', $this->lang->line('password'), 'trim|required|xss_clean');
+        if (st_turnstile_enabled()) { // SHULETECH: Cloudflare Turnstile, checked before the password
+            $this->form_validation->set_rules('cf-turnstile-response', 'Security check', 'callback_check_turnstile');
+        }
         if ($this->form_validation->run() == false) {
             if ($this->captchalib->is_captcha('userlogin')) {
                 $data['captcha_image'] = $this->captchalib->generate_captcha()['image'];
@@ -1021,4 +1027,14 @@ class Site extends Public_Controller
 
 
 
+
+    /** SHULETECH: form-validation callback for the Turnstile widget on the logins. */
+    public function check_turnstile($token = '')
+    {
+        if (st_turnstile_verify((string) $this->input->post('cf-turnstile-response'))) {
+            return true;
+        }
+        $this->form_validation->set_message('check_turnstile', 'Please complete the security check and try again.');
+        return false;
+    }
 }

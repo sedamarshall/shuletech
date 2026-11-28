@@ -22,7 +22,7 @@
     <!-- SHULETECH UI: sign-in pages -->
     <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/lucide-static@0.543.0/lucide.css">
     <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-icons.css?v=2">
-    <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-auth.css?v=4">
+    <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-auth.css?v=5">
     <script>(function(){var d=document.documentElement,t=null;try{t=localStorage.getItem("st-theme")}catch(e){}if(t!=="light"){d.classList.add("st-dark")}window.stToggleTheme=function(){var on=d.classList.toggle("st-dark");try{localStorage.setItem("st-theme",on?"dark":"light")}catch(e){}}})();</script>
 </head>
     <body>

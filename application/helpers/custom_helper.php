@@ -869,3 +869,66 @@ if (!function_exists('st_logo_imgs')) {
         return $out;
     }
 }
+
+/* ===================== SHULETECH: Cloudflare Turnstile ===================== */
+if (!function_exists('st_turnstile_keys')) {
+    /** [site_key, secret_key] from application/config/shuletech_security.php (both empty = off). */
+    function st_turnstile_keys()
+    {
+        $CI = &get_instance();
+        $CI->config->load('shuletech_security', true, true);
+        return array(
+            trim((string) $CI->config->item('turnstile_site_key', 'shuletech_security')),
+            trim((string) $CI->config->item('turnstile_secret_key', 'shuletech_security')),
+        );
+    }
+
+    function st_turnstile_enabled()
+    {
+        list($site, $secret) = st_turnstile_keys();
+        return $site !== '' && $secret !== '';
+    }
+
+    /** Widget markup + script; empty string when Turnstile is off. */
+    function st_turnstile_widget()
+    {
+        if (!st_turnstile_enabled()) {
+            return '';
+        }
+        list($site) = st_turnstile_keys();
+        return '<div class="st-turnstile"><div class="cf-turnstile" data-sitekey="' . html_escape($site) . '" data-size="flexible"></div></div>'
+            . '<script>(function(){var w=document.querySelector(".cf-turnstile");if(w){w.setAttribute("data-theme",document.documentElement.classList.contains("st-dark")?"dark":"light");}})();</script>'
+            . '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>';
+    }
+
+    /** Ask Cloudflare whether the token from the widget is genuine. */
+    function st_turnstile_verify($token)
+    {
+        list(, $secret) = st_turnstile_keys();
+        if ($secret === '') {
+            return true;
+        }
+        if (!is_string($token) || $token === '' || strlen($token) > 2048) {
+            return false;
+        }
+        $post = array('secret' => $secret, 'response' => $token);
+        if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+            $post['remoteip'] = $_SERVER['HTTP_CF_CONNECTING_IP'];
+        } elseif (!empty($_SERVER['REMOTE_ADDR'])) {
+            $post['remoteip'] = $_SERVER['REMOTE_ADDR'];
+        }
+        $ch = curl_init('https://challenges.cloudflare.com/turnstile/v0/siteverify');
+        curl_setopt_array($ch, array(
+            CURLOPT_POST => true, CURLOPT_POSTFIELDS => http_build_query($post), CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 10, CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_SSL_VERIFYPEER => true, CURLOPT_SSL_VERIFYHOST => 2,
+        ));
+        $raw = curl_exec($ch);
+        curl_close($ch);
+        $res = json_decode((string) $raw, true);
+        if (!is_array($res)) {
+            log_message('error', 'Turnstile: no answer from Cloudflare');
+            return false;   // fail closed: a login without a verified check is refused
+        }
+        return !empty($res['success']);
+    }
+}
