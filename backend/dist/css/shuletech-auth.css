@@ -131,3 +131,16 @@ html body .loginbg { max-width: none !important; }
 html body .st-auth-foot a { color: var(--muted-foreground) !important; text-decoration: none !important; }
 html body .st-auth-foot a:hover { color: var(--foreground) !important; }
 html body .st-auth-foot { gap: 16px; }
+
+/* SHULETECH: logo light/dark variants (st_logo_imgs helper) */
+.st-logo-dark { display: none !important; }
+html.st-dark .st-logo-dark { display: inline-block !important; }
+html.st-dark .st-logo-light.has-dark { display: none !important; }
+
+/* logo sits in the form column, left-aligned with the title, just above it */
+html body .loginbg .form-top {
+  position: static !important; width: 100%; max-width: 380px; margin: 0 auto 28px !important;
+  left: auto; right: auto; top: auto;
+}
+html body .loginbg .form-top img { max-height: 40px; }
+@media (max-width: 480px) { html body .loginbg .form-top { margin-bottom: 22px !important; } }

@@ -847,3 +847,25 @@ if (!function_exists('st_stat_card')) {
             . '</div>';
     }
 }
+
+if (!function_exists('st_logo_imgs')) {
+    /**
+     * SHULETECH: logo <img> for uploads/school_content/{$folder}/{$file}. If a "-white" copy exists
+     * next to it (e.g. logo-white.png), it is added too and shown automatically in dark mode.
+     */
+    function st_logo_imgs($folder, $file, $alt = '')
+    {
+        $folder = preg_replace('/[^a-z_]/', '', $folder);
+        $file   = basename((string) $file);
+        $rel    = 'uploads/school_content/' . $folder . '/';
+        $ver    = function ($f) use ($rel) { $p = FCPATH . $rel . $f; return is_file($p) ? '?v=' . filemtime($p) : ''; };
+        $dot    = strrpos($file, '.');
+        $white  = $dot !== false ? substr($file, 0, $dot) . '-white' . substr($file, $dot) : '';
+        $hasDark = $white !== '' && is_file(FCPATH . $rel . $white);
+        $out = '<img class="st-logo-light' . ($hasDark ? ' has-dark' : '') . '" src="' . base_url($rel . $file) . $ver($file) . '" alt="' . html_escape($alt) . '">';
+        if ($hasDark) {
+            $out .= '<img class="st-logo-dark" src="' . base_url($rel . $white) . $ver($white) . '" alt="' . html_escape($alt) . '">';
+        }
+        return $out;
+    }
+}

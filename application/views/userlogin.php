@@ -20,8 +20,8 @@
     <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-font.css?v=3">
     <!-- SHULETECH UI: sign-in pages -->
     <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/lucide-static@0.543.0/lucide.css">
-    <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-icons.css?v=1">
-    <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-auth.css?v=2">
+    <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-icons.css?v=2">
+    <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/shuletech-auth.css?v=4">
     <script>(function(){var d=document.documentElement,t=null;try{t=localStorage.getItem("st-theme")}catch(e){}if(t!=="light"){d.classList.add("st-dark")}window.stToggleTheme=function(){var on=d.classList.toggle("st-dark");try{localStorage.setItem("st-theme",on?"dark":"light")}catch(e){}}})();</script>
 </head>
 
@@ -49,7 +49,7 @@ if (empty($notice)) {
                                     <div class="st-auth-foot"><span>&copy; <?php echo date('Y'); ?> <?php echo html_escape($this->setting_model->getCurrentSchoolName()); ?></span><a href="<?php echo site_url('site/login'); ?>">Staff login &rarr;</a></div>
                                     <div class="form-top">
                                         <div class="form-top-left logowidth">
-                                            <img src="<?php echo base_url(); ?>uploads/school_content/admin_logo/<?php echo $this->setting_model->getAdminlogo();?>" />
+                                            <?php echo st_logo_imgs('admin_logo', $this->setting_model->getAdminlogo(), $this->customlib->getAppName()); ?>
                                         </div>
                                     </div>
                                     <div class="form-bottom">

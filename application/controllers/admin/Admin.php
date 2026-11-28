@@ -313,7 +313,7 @@ class Admin extends Admin_Controller
         foreach ($expensegraph as $key => $value) {
             $expensegraph[$key]['total'] = convertBaseAmountCurrencyFormat($value['total']);
             if (!empty($value['total'])) {
-                $month_expense = $month_expense + convertBaseAmountCurrencyFormat($value['total']);
+                $month_expense = $month_expense + (float) $value['total']; // SHULETECH: amountFormat() in the view converts; converting here too applied the rate twice
             }
         }
         $data['expensegraph']  = $expensegraph;
