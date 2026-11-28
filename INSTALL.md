@@ -25,13 +25,28 @@ chown -R www:www .  &&  chmod -R 775 application/config application/cache applic
 
 **Nginx / aaPanel** (Website → your site → URL rewrite), paste:
 ```nginx
-location ~ ^/(application|system|backup|temp)/ { deny all; return 403; }
-location ~ ^/install/sql/ { deny all; return 403; }
+# send clean URLs (e.g. /site/login) to the app
+location / {
+    try_files $uri $uri/ /index.php?/$request_uri;
+}
+
+# private folders. "^~" beats the panel's PHP handler, so .php files inside are blocked too
+location ^~ /application/ { deny all; return 403; }
+location ^~ /system/      { deny all; return 403; }
+location ^~ /backup/      { deny all; return 403; }
+location ^~ /temp/        { deny all; return 403; }
+location ^~ /install/sql/ { deny all; return 403; }
+
+# uploads: files are served, scripts never run or download
+location ^~ /uploads/ {
+    location ~* \.(php\d?|phtml|pht|phar|phps|pgif|shtml?|cgi|pl|py|sh|asp|aspx|jsp)$ { deny all; return 403; }
+}
+
+# hidden files (except .well-known), docs, dumps, logs
 location ~ /\.(?!well-known/) { deny all; return 404; }
-location ~* ^/uploads/.*\.(php\d?|phtml|pht|phar|phps|pgif|shtml?|cgi|pl|py|sh|asp|aspx|jsp)$ { deny all; return 403; }
 location ~* \.(md|sql|gz|log|bak|sh)$ { deny all; return 404; }
-location / { try_files $uri $uri/ /index.php?/$request_uri; }
 ```
+Plain `location ~` rules are **not** enough on aaPanel. The panel includes its PHP handler before the rewrite rules, so a regex deny never sees `.php` files. Keep the `^~` form.
 
 ## 4. Run the installer
 
