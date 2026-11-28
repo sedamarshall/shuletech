@@ -41,7 +41,8 @@ function db_connect(array $d, ?string &$err = null): ?mysqli {
 }
 
 /* ---------------- already installed ---------------- */
-if (is_file($LOCK) || is_file($CFG . '/database.php')) { // a configured site never re-runs the installer
+$justInstalled = ((int) ($_GET['step'] ?? 0) === 4) && !empty($_SESSION['done']);   // the installer's own finish page
+if (!$justInstalled && (is_file($LOCK) || is_file($CFG . '/database.php'))) { // a configured site never re-runs the installer
     page('Already installed', function () {
         echo '<div class="ico ok"><i>✓</i></div><h1>ShuleTech is already installed</h1>
               <p class="sub">The installer is locked. For safety, delete the <code>install</code> folder from the server.</p>
@@ -62,6 +63,7 @@ function requirements(string $ROOT, string $SQLFILE): array {
     }
     foreach (['application/config', 'application/cache', 'application/logs', 'uploads', 'temp', 'backend/captcha_images'] as $dir) {
         $p = $ROOT . '/' . $dir;
+        if (!is_dir($p)) { @mkdir($p, 0775, true); }   // e.g. empty folders that zip tools drop
         $r[] = ["Writable: $dir/", is_dir($p) && is_writable($p), "Make it writable by the web server, e.g. chown -R www:www and chmod 775 on $dir."];
     }
     $r[] = ['Installer database file', is_file($SQLFILE), 'install/sql/shuletech.sql.gz is missing. Re-upload the full ShuleTech zip.'];
