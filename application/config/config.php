@@ -24,7 +24,25 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   | a PHP script and you can easily do that on your own.
   |
  */
-$config['base_url'] = 'http://localhost/shuletech/';
+/*
+ | SHULETECH: base URL from the request host, but only for hosts we own
+ | (a forged Host header must not be able to change links in password-reset e-mails).
+ | Add a host here if the site gets another domain.
+ */
+$st_allowed_hosts = array('localhost', '127.0.0.1', 'shuletech.co.ke', 'www.shuletech.co.ke');
+$st_default_url   = 'https://shuletech.co.ke/';
+$st_host = isset($_SERVER['HTTP_HOST']) ? strtolower(preg_replace('/:\d+$/', '', $_SERVER['HTTP_HOST'])) : '';
+if ($st_host !== '' && in_array($st_host, $st_allowed_hosts, true)) {
+    $st_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+        || (isset($_SERVER['HTTP_CF_VISITOR']) && strpos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false);
+    $st_port = (isset($_SERVER['SERVER_PORT']) && !in_array((int) $_SERVER['SERVER_PORT'], array(80, 443), true)
+        && strpos($_SERVER['HTTP_HOST'], ':') !== false) ? ':' . (int) $_SERVER['SERVER_PORT'] : '';
+    $st_dir = isset($_SERVER['SCRIPT_NAME']) ? rtrim(str_replace(chr(92), '/', dirname($_SERVER['SCRIPT_NAME'])), '/') : '';
+    $config['base_url'] = ($st_https ? 'https' : 'http') . '://' . $st_host . $st_port . $st_dir . '/';
+} else {
+    $config['base_url'] = $st_default_url;
+}
 
 
 /*
