@@ -3,6 +3,10 @@
 <IfModule mod_alias.c>
 RedirectMatch 404 "(?i)/\.(?!well-known/)"
 </IfModule>
+# SHULETECH: never serve docs, dumps, logs or scripts from the web root
+<FilesMatch "\.(md|sql|gz|log|bak|sh)$">
+    Require all denied
+</FilesMatch>
 Options -Indexes
 
 <IfModule mod_rewrite.c>

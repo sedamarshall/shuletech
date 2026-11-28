@@ -27,6 +27,12 @@ class Pushnotification
 
     public function send($tokens, $msg, $action = "")
     {
+        // SHULETECH: the Firebase key file is not in git; without it, skip app push instead of crashing
+        // the request (e.g. a fee payment). SMS/e-mail notifications are unaffected.
+        if (!is_file($this->key_file_path) || empty($tokens)) {
+            log_message('info', 'Push notification skipped: no Firebase key file or no device token.');
+            return false;
+        }
         $creadentials = new ServiceAccountCredentials('https://www.googleapis.com/auth/firebase.messaging', json_decode(file_get_contents($this->key_file_path), true));
         $this->token = $creadentials->fetchAuthToken(HttpHandlerFactory::build());
         $data = [

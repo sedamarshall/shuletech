@@ -144,3 +144,7 @@ html body .loginbg .form-top {
 }
 html body .loginbg .form-top img { max-height: 40px; }
 @media (max-width: 480px) { html body .loginbg .form-top { margin-bottom: 22px !important; } }
+
+/* Cloudflare Turnstile widget on the logins */
+html body .loginbg .st-turnstile { margin: 4px 0 6px; min-height: 65px; }
+html body .loginbg .st-turnstile-error:empty { display: none; }

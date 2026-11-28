@@ -9,3 +9,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $config['link_signing_key'] = 'CHANGE_ME_run_php_-r_echo_bin2hex_random_bytes_32';
 // How long a download link stays valid, in seconds (90 days).
 $config['link_signing_ttl'] = 90 * 24 * 60 * 60;
+
+/*
+ | Cloudflare Turnstile on the staff and student/parent logins.
+ | Create a widget at dash.cloudflare.com -> Turnstile (add your domain), then paste both keys here.
+ | Leave them empty to switch Turnstile off.
+ */
+$config['turnstile_site_key']   = '';
+$config['turnstile_secret_key'] = '';

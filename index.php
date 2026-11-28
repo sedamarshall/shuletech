@@ -1,4 +1,10 @@
 <?php
+// SHULETECH: a fresh upload has no database config yet - send visitors to the web installer.
+if (!is_file(__DIR__ . '/application/config/database.php') && is_file(__DIR__ . '/install/index.php') && PHP_SAPI !== 'cli') {
+    $st_dir = rtrim(str_replace(chr(92), '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/index.php')), '/');
+    header('Location: ' . $st_dir . '/install/', true, 302);
+    exit;
+}
 /**
  * CodeIgniter
  *
